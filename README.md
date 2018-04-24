@@ -11,15 +11,12 @@ to create a JWT authentication compatibility layer for TPN.
 The key benefit for consuming applications is that the JWT contains the token
 expiry enabling clients to request a new JWT prior to expiry.
 
-## Use Cases
-
-- Wrapping an existing service with JWT based authentication
-
 ## Deploy
 
 In order to deploy the you endpoint simply run
 
 ```bash
+npm install
 serverless deploy
 ```
 
