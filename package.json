@@ -1,0 +1,19 @@
+{
+  "name": "tpn-jwt-auth-proxy",
+  "version": "1.0.0",
+  "description": "Example demonstrates how to make TPN authentication JWT compatible",
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "mocha": "^5.1.0",
+    "request-debug": "^0.2.0",
+    "serverless": "^1.26.1"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "dependencies": {
+    "jsonwebtoken": "^8.2.1",
+    "request": "^2.85.0"
+  }
+}
