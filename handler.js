@@ -18,15 +18,19 @@ module.exports.generatejwt = (event, context, callback) => {
     creds = JSON.parse(event.body);
   }
   console.log(`creds: ${JSON.stringify(creds)}`);
-  tpn.generatetoken(creds['username'], creds['password'], creds['domain'], function(err, token) {
-    console.log(`token: ${JSON.stringify(token)}`);
-    tpn.generatejwt(token, JWT_SECRET, function(err, jwt) {
-      // TODO handle err
-      console.log(`jwt: ${jwt}`);
-      callback(err, {
-        statusCode: 200,
-        body: jwt,
-      });
+  const token = {
+    "token_type": "bearer",
+    "expires_in": 6555,
+    "refresh_token": "e8995999df115d8cc67aba2c1c6d2f79",
+    "access_token": "FAKE token for testing",
+  };
+  console.log(`token: ${JSON.stringify(token)}`);
+  tpn.generatejwt(token, JWT_SECRET, function(err, jwt) {
+    // TODO handle err
+    console.log(`jwt: ${jwt}`);
+    callback(err, {
+      statusCode: 200,
+      body: jwt,
     });
   });
 };
@@ -38,9 +42,8 @@ module.exports.proxyRequests = (event, context, callback) => {
   console.log(`jwt: ${jwt}`);
   tpn.extractAccessToken(jwt, JWT_SECRET, function(err, token) {
     console.log(`token: ${token}`);
-    console.log(`tpn.proxyRequest: ${tpn.proxyRequest}`);
     // TODO handle err
     // TODO handle error when creating a topology and one already exists
-    tpn.proxyRequest(event.httpMethod, event.path, token, event.body, callback);
+    callback(err, token);
   });
 };

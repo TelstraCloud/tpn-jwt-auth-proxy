@@ -1,4 +1,4 @@
-service: tpn-jwt-auth-proxy
+service: tpn-jwt-auth-proxy-rs-debugging
 
 frameworkVersion: ">=1.1.0 <2.0.0"
 
