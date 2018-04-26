@@ -4,13 +4,22 @@ const JWT_SECRET = 'secret';
 
 module.exports.generatejwt = (event, context, callback) => {
   console.log('generatejwt');
-  console.log(event);
+  // console.log(event);
+  console.log(`event.headers: ${JSON.stringify(event.headers)}`);
   console.log(`event.body: ${event.body}`);
-  // remove "Bearer"
-  const creds = JSON.parse(event.body);
-  console.log(`creds: ${creds}`);
+  
+  // if there is an Authorization header, get the credentials from there
+  // otherwise get them from the body of the request
+  let creds = null;
+  if (event.headers.Authorization) {
+    // remove "Bearer "
+    creds = JSON.parse(event.headers['Authorization'].substring(7));
+  } else {
+    creds = JSON.parse(event.body);
+  }
+  console.log(`creds: ${JSON.stringify(creds)}`);
   tpn.generatetoken(creds['username'], creds['password'], creds['domain'], function(err, token) {
-    console.log(`token: ${token}`);
+    console.log(`token: ${JSON.stringify(token)}`);
     tpn.generatejwt(token, JWT_SECRET, function(err, jwt) {
       // TODO handle err
       console.log(`jwt: ${jwt}`);
