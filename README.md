@@ -61,8 +61,16 @@ curl -d '{"username":"[username]","password":"[password]","domain":"[domain]"}' 
   https://k7lb3fxxxx.execute-api.us-east-1.amazonaws.com/dev/1.0.0/auth/generatejwt
 ```
 
+The api key can also be sent as an Authorization header.
+
+```bash
+curl -H 'Authorization: Bearer {"username":"[username]","password":"[password]","domain":"[domain]"}' \
+  https://k7lb3fxxxx.execute-api.us-east-1.amazonaws.com/dev/1.0.0/auth/generatejwt
+```
+
 The response will be a JWT containing the access token as a field. https://jwt.io
 can be used to decode your token.
+
 ```json
 {
   "access_token": "13d29b20cd68ff60f2b74c6b735exxxx",
