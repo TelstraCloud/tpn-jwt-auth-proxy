@@ -34,9 +34,15 @@ function generatejwt(token, secret, callback) {
 
 // Validate jwt signature and return the access token
 function extractAccessToken(token, secret, callback) {
-  console.log(`extractAccessToken jwt.verify: ${jwt.verify}`);
   jwt.verify(token, secret, function(err, payload) {
-    console.log(`err: ${err}`);
+    if (err) {
+      console.log(`extractAccessToken err: ${err}`);  
+      const response = {
+        statusCode: 500,
+        body: `Could not verify JWT. err: ${err}`,
+      };
+      callback(err, response);
+    }
     console.log(`access_token: ${payload.access_token}`);
     callback(err, payload.access_token);
   });
@@ -45,11 +51,12 @@ function extractAccessToken(token, secret, callback) {
 // currently expects body as a string object and returns body as a string. This
 // is a bit inconsistent
 function proxyRequest(method, path, token, body, callback) {
-  console.log('proxyRequest');
-  console.log(`method ${method}`);
-  console.log(`path ${path}`);
-  console.log(`token ${token}`);
-  console.log(`body ${body}`);
+  console.log('Request to TPN:');
+  console.log(`  host: ${TPN_BASE}`);
+  console.log(`  method: ${method}`);
+  console.log(`  path: ${path}`);
+  console.log(`  token: ${token}`);
+  console.log(`  body: ${body}`);
   request({
     method: method,
     uri: `${TPN_BASE}${path}`,
@@ -60,16 +67,12 @@ function proxyRequest(method, path, token, body, callback) {
     body: body,
   },
   function (err, httpResponse, body) {
-    console.log('=============================httpResponse=============================');
-    console.log(httpResponse);
-    console.log('============================= body =============================');
-    console.log(body);
     const response = {
       statusCode: httpResponse.statusCode,
       body: body,
     };
-    console.log('============================= response =============================');
-    console.log(`response: ${JSON.stringify(response)}`);
+    console.log('Response from TPN:');
+    console.log(`  response: ${JSON.stringify(response)}`);
     callback(err, response);
   });
 }
