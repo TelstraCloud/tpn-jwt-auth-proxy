@@ -76,7 +76,7 @@ The response will be JSON containing the jwt as a field called access_token:
 }
 ```
 
-The JWT containing the access token as a field. https://jwt.io can be used to
+The JWT contains the access token as a field. https://jwt.io can be used to
 decode the token.
 
 ```json
