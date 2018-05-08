@@ -36,15 +36,11 @@ function generatejwt(token, secret, callback) {
 function extractAccessToken(token, secret, callback) {
   jwt.verify(token, secret, function(err, payload) {
     if (err) {
-      console.log(`extractAccessToken err: ${err}`);  
-      const response = {
-        statusCode: 500,
-        body: `Could not verify JWT. err: ${err}`,
-      };
-      callback(err, response);
+      callback(err, null);
+    } else {
+      console.log(`access_token: ${payload.access_token}`);
+      callback(err, payload.access_token);
     }
-    console.log(`access_token: ${payload.access_token}`);
-    callback(err, payload.access_token);
   });
 }
 

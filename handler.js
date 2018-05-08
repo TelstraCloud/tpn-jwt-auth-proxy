@@ -46,7 +46,7 @@ module.exports.generatejwt = (event, context, callback) => {
       console.log(`jwt: ${jwt}`);
       callback(err, {
         statusCode: 200,
-        body: JSON.stringify({ access_token: jwt }),
+        body: JSON.stringify({ access_token: jwt, expires_in: token.expires_in }),
       });
     });
   });
@@ -58,14 +58,28 @@ module.exports.proxyRequests = (event, context, callback) => {
   const jwt = event.headers['Authorization'].substring(7);
   tpn.extractAccessToken(jwt, JWT_SECRET, function(err, token) {
     if (err) {
-      console.log(`extractAccessToken err: ${err}`);
-      const response = {
-        statusCode: 500,
-        body: `Could not extract access token from the JWT. err: ${err}`,
-      };
-      callback(err, response);
+      console.log(`extractAccessToken err: ${JSON.stringify(err)}`);
+      if (err.name === 'TokenExpiredError') {
+        callback(null, {
+          statusCode: 401,
+          body: JSON.stringify(err),
+        });
+      } else if (err.name === 'JsonWebTokenError') {
+        callback(null, {
+          statusCode: 400,
+          body: JSON.stringify(err),
+        });
+      } else {
+        // hmmm not sure what's wrong!
+        // Haven't made an upstream call yet so must be us!
+        callback(null, {
+          statusCode: 500,
+          body: `Could not extract access token from the JWT. err: ${JSON.stringify(err)}`,
+        });
+      }
+    } else {
+      // TODO handle error when creating a topology and one already exists
+      tpn.proxyRequest(event.httpMethod, event.path, token, event.body, callback);
     }
-    // TODO handle error when creating a topology and one already exists
-    tpn.proxyRequest(event.httpMethod, event.path, token, event.body, callback);
   });
 };
