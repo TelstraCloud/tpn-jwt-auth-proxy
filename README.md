@@ -68,11 +68,14 @@ curl -H 'Authorization: Bearer {"username":"[username]","password":"[password]",
   https://k7lb3fxxxx.execute-api.us-east-1.amazonaws.com/dev/1.0.0/auth/generatejwt
 ```
 
-The response will be JSON containing the jwt as a field called access_token:
+The response will be JSON containing:
+- the JWT as a field called `access_token`.
+- how long until the token expires in seconds called `expires_in`. 
 
 ```bash
 { 
   access_token: [your JWT]
+  expires_in: [seconds until JWT expiry]
 }
 ```
 
