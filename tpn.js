@@ -65,6 +65,9 @@ function proxyRequest(method, path, token, body, callback) {
   function (err, httpResponse, body) {
     const response = {
       statusCode: httpResponse.statusCode,
+      headers: {
+        "Cache-Control" : "no-cache",
+      },
       body: body,
     };
     console.log('Response from TPN:');

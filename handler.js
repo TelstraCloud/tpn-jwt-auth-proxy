@@ -1,5 +1,5 @@
 'use strict';
-const tpn = require('tpn');
+const tpn = require('./tpn');
 const JWT_SECRET = 'secret';
 
 function logRequest(event) {
@@ -31,6 +31,7 @@ module.exports.generatejwt = (event, context, callback) => {
         body: `Could not generate access token from the JWT. err: ${err}`,
       };
       callback(err, response);
+      return;
     }
     console.log(`TPN token: ${JSON.stringify(token)}`);
 
@@ -42,12 +43,14 @@ module.exports.generatejwt = (event, context, callback) => {
           body: `Could not generate JWT. err: ${err}`,
         };
         callback(err, response);
+        return;
       }
       console.log(`jwt: ${jwt}`);
       callback(err, {
         statusCode: 200,
         body: JSON.stringify({ access_token: jwt, expires_in: token.expires_in }),
       });
+      return;
     });
   });
 };
@@ -55,6 +58,14 @@ module.exports.generatejwt = (event, context, callback) => {
 // proxies the requests to TPN transforming the Authorization header
 module.exports.proxyRequests = (event, context, callback) => {
   logRequest(event);
+  if (!event.headers['Authorization']) {
+    console.log('No Authorization header found');
+    callback(null, {
+      statusCode: 401,
+      body: 'No authorization header provided.'
+    });
+    return;
+  }
   const jwt = event.headers['Authorization'].substring(7);
   tpn.extractAccessToken(jwt, JWT_SECRET, function(err, token) {
     if (err) {
@@ -64,11 +75,13 @@ module.exports.proxyRequests = (event, context, callback) => {
           statusCode: 401,
           body: JSON.stringify(err),
         });
+        return;
       } else if (err.name === 'JsonWebTokenError') {
         callback(null, {
           statusCode: 400,
           body: JSON.stringify(err),
         });
+        return;
       } else {
         // hmmm not sure what's wrong!
         // Haven't made an upstream call yet so must be us!
@@ -76,10 +89,12 @@ module.exports.proxyRequests = (event, context, callback) => {
           statusCode: 500,
           body: `Could not extract access token from the JWT. err: ${JSON.stringify(err)}`,
         });
+        return;
       }
     } else {
       // TODO handle error when creating a topology and one already exists
       tpn.proxyRequest(event.httpMethod, event.path, token, event.body, callback);
+      return;
     }
   });
 };
